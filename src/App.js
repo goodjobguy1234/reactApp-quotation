@@ -10,6 +10,7 @@ function App() {
   const itemRef = useRef();
   const ppuRef = useRef();
   const qtyRef = useRef();
+  const disRef = useRef();
 
   // const [dataItems, setDataItems] = useState([]);
   const [dataItems, setDataItems] = useLocalStorage("dataItems",[]);
@@ -37,9 +38,24 @@ function App() {
       item: product.name,
       ppu: ppuRef.current.value,
       qty: qtyRef.current.value,
+      dis: disRef.current.value
     };
 
-    dataItems.push(itemObj);
+   
+    let {isHave, itemIndex} = checkIsRedundant(itemObj.pid, itemObj.ppu)
+ 
+    if(isHave) {
+      dataItems[itemIndex] = {
+        pid: pid,
+        item: product.name,
+        ppu: ppuRef.current.value,
+        qty: parseInt(dataItems[itemIndex].qty) + parseInt(qtyRef.current.value),
+        dis: parseInt(dataItems[itemIndex].dis) + parseInt(disRef.current.value)
+      }
+    } else {
+      dataItems.push(itemObj);
+    }
+   
     setDataItems([...dataItems]);   
   };
 
@@ -50,8 +66,27 @@ function App() {
   }
 
   const options = dummyProductList.map((v) => {
+    
     return <option value={v.id}>{v.name}</option>;
   });
+
+  let checkIsRedundant = (itemId, itemPrice) => {
+    let isHave = false
+    let itemIndex = -1
+    console.log(dataItems)
+  
+    dataItems.forEach((element,index) => {
+
+      if(element.pid === itemId && element.ppu === itemPrice) {
+        isHave = true
+        itemIndex = index
+      }
+    });
+    return {
+      "isHave": isHave,
+      "itemIndex": itemIndex
+    }
+  }
 
   return (
     <Container>
@@ -73,19 +108,26 @@ function App() {
               <Form.Label>Price</Form.Label>
               <Form.Control
                 type="number"
-                placeholder="Price Per Unit"
+                placeholder= "Price"
+                defaultValue={dummyProductList[0].price}
                 ref={ppuRef}
               />
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formQauntity">
               <Form.Label>Quantity</Form.Label>
-              <Form.Control type="number" placeholder="Quantity" ref={qtyRef} />
+              <Form.Control type="number" placeholder="Quantity" defaultValue={1} ref={qtyRef} min={1}/>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formDiscount">
+              <Form.Label>Discount</Form.Label>
+              <Form.Control type="number" placeholder="Discount" ref={disRef} defaultValue={0} min={0}/>
             </Form.Group>
 
             <Button variant="outline-dark" onClick={addItem}>
               Add
             </Button>
+
           </Form>
         </Col>
         <Col>

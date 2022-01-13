@@ -11,25 +11,30 @@ const styles = {
 function QuotationTable({ data, setDataItems }) {
   const [dataRows, setDataRows] = useState();
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalDiscount, setTotalDiscount] = useState(0);
 
   useEffect(() => {
     let sum = 0;
+    let disSum = 0;
     const z = data.map((v, i) => {
       let amount = v.qty * v.ppu;
-      sum += amount;
+      sum += amount - v.dis;
+      disSum += parseInt(v.dis);
       return (
         <tr key={i}>
           <td><FaTrash onClick={() => deleteClick(i)}/></td>
           <td style={styles.textCenter}>{v.qty}</td>
           <td>{v.item}</td>
           <td style={styles.textRight}>{numberWithCommas(v.ppu)}</td>
-          <td style={styles.textRight}>{numberWithCommas(amount)}</td>
+          <td style={styles.textRight}>{numberWithCommas(v.dis)}</td>
+          <td style={styles.textRight}>{numberWithCommas(amount - v.dis)}</td>
         </tr>
       );
     });
 
     setDataRows(z);
     setTotalPrice(sum);
+    setTotalDiscount(disSum);
   }, [data]);
 
   const deleteClick = (i) => {
@@ -65,6 +70,7 @@ function QuotationTable({ data, setDataItems }) {
             <th>Qty</th>
             <th>Item</th>
             <th>Price/Unit</th>
+            <th>Discount</th>
             <th>Amount</th>
           </tr>
         </thead>
@@ -73,6 +79,7 @@ function QuotationTable({ data, setDataItems }) {
           <tr>
             <th colSpan={3}></th>
             <th style={styles.textCenter}>Total</th>
+            <th style={styles.textRight}>{numberWithCommas(totalDiscount)}</th>
             <th style={styles.textRight}>{numberWithCommas(totalPrice)}</th>
           </tr>
         </tfoot>
