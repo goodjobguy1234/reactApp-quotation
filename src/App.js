@@ -30,6 +30,11 @@ function App() {
       return;
     }
 
+    if(disRef.current.value < 0 || disRef.current.value > (qtyRef.current.value * ppuRef.current.value)) {
+      alert('Invalid discount value');
+      return
+    }
+
     const pid = itemRef.current.value;
     const product = dummyProductList.find((e) => e.id === pid);
 
@@ -40,7 +45,6 @@ function App() {
       qty: qtyRef.current.value,
       dis: disRef.current.value
     };
-
    
     let {isHave, itemIndex} = checkIsRedundant(itemObj.pid, itemObj.ppu)
  
@@ -52,10 +56,10 @@ function App() {
         qty: parseInt(dataItems[itemIndex].qty) + parseInt(qtyRef.current.value),
         dis: parseInt(dataItems[itemIndex].dis) + parseInt(disRef.current.value)
       }
+     
     } else {
       dataItems.push(itemObj);
     }
-   
     setDataItems([...dataItems]);   
   };
 
